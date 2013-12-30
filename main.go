@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -20,8 +19,6 @@ var (
 )
 
 func main() {
-	flag.Parse()
-
 	config = loadConfig("config.json")
 
 	index_html = getIndexFile("public/index.html")
