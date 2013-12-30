@@ -1,0 +1,3 @@
+[submodule "public/candy"]
+	path = public/candy
+	url = git@github.com:candy-chat/candy.git

@@ -1,0 +1,16 @@
+{
+	"candy": {
+		"core": { "debug": false, "autojoin": ["test@conference.localhost.local"] },
+		"view": { "resources": "candy/res/" },
+		"connect": []
+	},
+	"http_bind": {
+		"host": "localhost",
+		"port": 5280,
+		"path": "/http-bind/"
+	},
+	"app": {
+		"host": "localhost",
+		"port": 8080
+	}
+}
