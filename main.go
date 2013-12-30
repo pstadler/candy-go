@@ -21,7 +21,7 @@ var (
 func main() {
 	config = loadConfig("config.json")
 
-	index_html = getIndexFile("public/index.html")
+	index_html = parseIndexFile("public/index.html")
 
 	http.HandleFunc("/", serveIndexFunc)
 	http.HandleFunc("/http-bind/", serveProxyFunc)
@@ -65,7 +65,7 @@ func serveProxyFunc(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, buf.String())
 }
 
-func getIndexFile(path string) string {
+func parseIndexFile(path string) string {
 	buf, _ := ioutil.ReadFile(path)
 	str := string(buf)
 
