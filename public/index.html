@@ -11,8 +11,8 @@
 	<script type="text/javascript" src="candy/candy.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function() {
-			Candy.init('http-bind/', OPTIONS);
-			Candy.Core.connect(CONNECT);
+			Candy.init('http-bind/', {core: {{.core}}, view: {{.view}}});
+			Candy.Core.connect({{.connect}});
 		});
 	</script>
 </head>

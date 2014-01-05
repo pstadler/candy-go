@@ -1,26 +1,26 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
+	"text/template"
 )
 
 var (
-	config       *Configuration
-	index_html   string
-	proxy_target *url.URL
+	config     *Configuration
+	proxy_url  *url.URL
+	index_html string
 )
 
 func main() {
 	config = loadConfig("config.json")
 
 	index_html = parseIndexFile("public/index.html")
-	proxy_target, _ = url.Parse(fmt.Sprintf("%s:%d%s",
+	proxy_url, _ = url.Parse(fmt.Sprintf("%s:%d%s",
 		config.HTTP_Bind.Host, config.HTTP_Bind.Port, config.HTTP_Bind.Path))
 
 	http.HandleFunc("/", serveIndexFunc)
@@ -37,8 +37,8 @@ func serveIndexFunc(w http.ResponseWriter, r *http.Request) {
 
 func serveProxyFunc(w http.ResponseWriter, r *http.Request) {
 	r.RequestURI = ""
-	r.URL = proxy_target
-	r.Host = proxy_target.Host
+	r.URL = proxy_url
+	r.Host = proxy_url.Host
 
 	client := &http.Client{}
 	response, _ := client.Do(r)
@@ -49,13 +49,13 @@ func serveProxyFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func parseIndexFile(path string) string {
-	buf, _ := ioutil.ReadFile(path)
-	str := string(buf)
+	core, _ := json.Marshal(config.Candy.Core)
+	view, _ := json.Marshal(config.Candy.View)
+	connect, _ := json.Marshal(config.Candy.Connect)
+	connect = connect[1 : len(connect)-1]
 
-	core_config, _ := json.Marshal(config.Candy.Core)
-	view_config, _ := json.Marshal(config.Candy.View)
-	connect_config, _ := json.Marshal(config.Candy.Connect)
-	str = strings.Replace(str, "OPTIONS", "{core:"+string(core_config)+",view:"+string(view_config)+"}", 1)
-	str = strings.Replace(str, "CONNECT", string(connect_config[1:len(connect_config)-1]), 1)
-	return str
+	var buf bytes.Buffer
+	t, _ := template.ParseFiles(path)
+	t.Execute(&buf, map[string]string{"core": string(core), "view": string(view), "connect": string(connect)})
+	return buf.String()
 }
