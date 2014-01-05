@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	config     *Configuration
-	index_html string
+	config       *Configuration
+	index_html   string
 	proxy_target *url.URL
 )
 
@@ -65,8 +65,8 @@ func parseIndexFile(path string) string {
 	// TODO: make this more pretty
 	core_config, _ := json.Marshal(config.Candy.Core)
 	view_config, _ := json.Marshal(config.Candy.View)
-	connect_config, _ := json.Marshal(strings.Join(config.Candy.Connect, ","))
+	connect_config, _ := json.Marshal(config.Candy.Connect)
 	str = strings.Replace(str, "OPTIONS", "{core:"+string(core_config)+",view:"+string(view_config)+"}", 1)
-	str = strings.Replace(str, "CONNECT", string(connect_config), 1)
+	str = strings.Replace(str, "CONNECT", string(connect_config[1:len(connect_config)-1]), 1)
 	return str
 }

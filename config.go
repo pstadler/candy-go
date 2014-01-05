@@ -10,14 +10,9 @@ import (
 
 type Configuration struct {
 	Candy struct {
-		Core struct {
-			Debug    bool     `json:"debug"`
-			Autojoin []string `json:"autojoin"`
-		}
-		View struct {
-			Resources string `json:"resources"`
-		}
-		Connect []string
+		Core    interface{}
+		View    interface{}
+		Connect interface{}
 	}
 	HTTP_Bind struct {
 		Host string
