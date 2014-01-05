@@ -5,7 +5,7 @@
 		"connect": []
 	},
 	"http_bind": {
-		"host": "localhost",
+		"host": "http://localhost",
 		"port": 5280,
 		"path": "/http-bind/"
 	},

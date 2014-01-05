@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
@@ -10,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"unicode"
 )
 
 var (
@@ -36,14 +34,12 @@ func serveIndexFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func serveProxyFunc(w http.ResponseWriter, r *http.Request) {
-	proxy_target := fmt.Sprintf("http://%s:%d%s",
-		config.HTTP_Bind.Host, config.HTTP_Bind.Port, config.HTTP_Bind.Path)
-	target_url, _ := url.Parse(proxy_target)
+	target_url, _ := url.Parse(fmt.Sprintf("%s:%d%s",
+		config.HTTP_Bind.Host, config.HTTP_Bind.Port, config.HTTP_Bind.Path))
 
-	r.URL = target_url
 	r.RequestURI = ""
-	r.URL.Scheme = strings.Map(unicode.ToLower, r.URL.Scheme)
-	r.Host = config.HTTP_Bind.Host
+	r.URL = target_url
+	r.Host = target_url.Host
 
 	client := &http.Client{}
 	response, _ := client.Do(r)
@@ -58,11 +54,8 @@ func serveProxyFunc(w http.ResponseWriter, r *http.Request) {
 	default:
 		reader = response.Body
 	}
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(reader)
-
 	w.Header().Set("Content-Type", response.Header.Get("Content-Type"))
-	fmt.Fprintf(w, buf.String())
+	io.Copy(w, reader)
 }
 
 func parseIndexFile(path string) string {
