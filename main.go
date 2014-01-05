@@ -1,7 +1,6 @@
 package main
 
 import (
-	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -44,25 +43,15 @@ func serveProxyFunc(w http.ResponseWriter, r *http.Request) {
 	client := &http.Client{}
 	response, _ := client.Do(r)
 
-	defer response.Body.Close()
-
-	var reader io.ReadCloser
-	switch response.Header.Get("Content-Encoding") {
-	case "gzip":
-		reader, _ = gzip.NewReader(response.Body)
-		defer reader.Close()
-	default:
-		reader = response.Body
-	}
 	w.Header().Set("Content-Type", response.Header.Get("Content-Type"))
-	io.Copy(w, reader)
+	w.Header().Set("Content-Encoding", response.Header.Get("Content-Encoding"))
+	io.Copy(w, response.Body)
 }
 
 func parseIndexFile(path string) string {
 	buf, _ := ioutil.ReadFile(path)
 	str := string(buf)
 
-	// TODO: make this more pretty
 	core_config, _ := json.Marshal(config.Candy.Core)
 	view_config, _ := json.Marshal(config.Candy.View)
 	connect_config, _ := json.Marshal(config.Candy.Connect)
