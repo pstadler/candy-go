@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,23 +10,19 @@ import (
 )
 
 var (
-	config     *Configuration
 	proxy_url  *url.URL
 	index_html string
 )
 
 func main() {
-	config = loadConfig("config.json")
-
 	index_html = parseIndexFile("public/index.html")
-	proxy_url, _ = url.Parse(fmt.Sprintf("%s:%d%s",
-		config.HTTP_Bind.Host, config.HTTP_Bind.Port, config.HTTP_Bind.Path))
+	proxy_url, _ = url.Parse(config("HTTP_Bind"))
 
 	http.HandleFunc("/", serveIndexFunc)
 	http.HandleFunc("/http-bind/", serveProxyFunc)
 	http.Handle("/candy/", http.StripPrefix("/candy/", http.FileServer(http.Dir("./public/candy/"))))
 
-	http.ListenAndServe(fmt.Sprintf("%s:%d", config.App.Host, config.App.Port), nil)
+	http.ListenAndServe(config("App"), nil)
 }
 
 func serveIndexFunc(w http.ResponseWriter, r *http.Request) {
@@ -49,13 +44,8 @@ func serveProxyFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func parseIndexFile(path string) string {
-	core, _ := json.Marshal(config.Candy.Core)
-	view, _ := json.Marshal(config.Candy.View)
-	connect, _ := json.Marshal(config.Candy.Connect)
-	connect = connect[1 : len(connect)-1]
-
 	var buf bytes.Buffer
 	t, _ := template.ParseFiles(path)
-	t.Execute(&buf, map[string]string{"core": string(core), "view": string(view), "connect": string(connect)})
+	t.Execute(&buf, map[string]string{"core": config("Core"), "view": config("View"), "connect": config("Connect")})
 	return buf.String()
 }

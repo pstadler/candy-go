@@ -4,11 +4,7 @@
 		"view": { "resources": "candy/res/" },
 		"connect": []
 	},
-	"http_bind": {
-		"host": "http://localhost",
-		"port": 5280,
-		"path": "/http-bind/"
-	},
+	"http_bind": "http://localhost:5280/http-bind/",
 	"app": {
 		"host": "localhost",
 		"port": 8080

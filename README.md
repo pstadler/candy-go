@@ -9,4 +9,12 @@ Deploy [Candy](http://candy-chat.github.com/candy/) as a [Go](http://golang.org)
 * Change the preferences in `config.json` to fit your setup (http://candy-chat.github.io/candy/#configuration)
 * Run it with `make`
 
-*Note: As this is my first project in Go, I'd be glad to get responses from more experienced developers.*
+## Heroku
+
+* Copy `.env.sample` to `.env`
+* Change the preferences in `.env` to fit your setup (http://candy-chat.github.io/candy/#configuration)
+* `heroku create`
+* `heroku plugins:install git://github.com/ddollar/heroku-config.git`
+* `heroku config:push` to push your `.env` configuration
+* `git push heroku master` to deploy it
+* `heroku apps:open` to enjoy it
