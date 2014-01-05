@@ -14,12 +14,15 @@ import (
 var (
 	config     *Configuration
 	index_html string
+	proxy_target *url.URL
 )
 
 func main() {
 	config = loadConfig("config.json")
 
 	index_html = parseIndexFile("public/index.html")
+	proxy_target, _ = url.Parse(fmt.Sprintf("%s:%d%s",
+		config.HTTP_Bind.Host, config.HTTP_Bind.Port, config.HTTP_Bind.Path))
 
 	http.HandleFunc("/", serveIndexFunc)
 	http.HandleFunc("/http-bind/", serveProxyFunc)
@@ -34,12 +37,9 @@ func serveIndexFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func serveProxyFunc(w http.ResponseWriter, r *http.Request) {
-	target_url, _ := url.Parse(fmt.Sprintf("%s:%d%s",
-		config.HTTP_Bind.Host, config.HTTP_Bind.Port, config.HTTP_Bind.Path))
-
 	r.RequestURI = ""
-	r.URL = target_url
-	r.Host = target_url.Host
+	r.URL = proxy_target
+	r.Host = proxy_target.Host
 
 	client := &http.Client{}
 	response, _ := client.Do(r)
